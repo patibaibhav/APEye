@@ -1,0 +1,1 @@
+{"items":[{"id":1,"request_id":"8f8f7b32-9009-4dcb-b214-01b6f3397629","occurred_at":"2026-01-15T10:30:00Z","source_ip":"203.0.113.10","path":"/api/logs","method":"GET","status_code":200,"response_time_ms":14,"auth_outcome":"AUTHENTICATED","user_id":1}],"page":1,"page_size":25,"total_items":1,"total_pages":1}
