@@ -1,0 +1,16 @@
+{
+  "classes": [
+    { "status_class": "2xx", "count": 1285 },
+    { "status_class": "3xx", "count": 12 },
+    { "status_class": "4xx", "count": 115 },
+    { "status_class": "5xx", "count": 8 }
+  ],
+  "codes": [
+    { "status_code": 200, "count": 1180 },
+    { "status_code": 201, "count": 105 },
+    { "status_code": 401, "count": 65 },
+    { "status_code": 403, "count": 25 },
+    { "status_code": 404, "count": 25 },
+    { "status_code": 500, "count": 8 }
+  ]
+}

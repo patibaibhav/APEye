@@ -1,0 +1,36 @@
+{
+  "window": {
+    "from": "2026-01-14T10:30:00Z",
+    "to": "2026-01-15T10:30:00Z"
+  },
+  "generated_at": "2026-01-15T10:30:00Z",
+  "totals": {
+    "total_requests": 1420,
+    "successful_requests": 1285,
+    "failed_requests": 135,
+    "total_alerts": 3,
+    "high_severity_alerts": 1,
+    "distinct_suspicious_ips": 2
+  },
+  "alerts_by_category": {
+    "BRUTE_FORCE": 1,
+    "RECONNAISSANCE": 1,
+    "EXCESSIVE_REQUESTS": 1,
+    "UNAUTHORIZED_ACCESS": 0
+  },
+  "alerts_by_severity": {
+    "HIGH": 1,
+    "MEDIUM": 1,
+    "LOW": 1
+  },
+  "top_source_ips": [
+    { "source_ip": "203.0.113.10", "alert_count": 1 },
+    { "source_ip": "198.51.100.25", "alert_count": 1 },
+    { "source_ip": "192.0.2.42", "alert_count": 1 }
+  ],
+  "top_endpoints": [
+    { "endpoint": "/api/auth/login", "request_count": 420, "error_count": 65 },
+    { "endpoint": "/api/logs", "request_count": 310, "error_count": 5 },
+    { "endpoint": "/api/dashboard/summary", "request_count": 280, "error_count": 0 }
+  ]
+}

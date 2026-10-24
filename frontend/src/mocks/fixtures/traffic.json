@@ -1,0 +1,15 @@
+{
+  "interval": "hour",
+  "points": [
+    { "bucket_start": "2026-01-15T00:00:00Z", "total": 120, "successful": 110, "failed": 10 },
+    { "bucket_start": "2026-01-15T01:00:00Z", "total": 85,  "successful": 80,  "failed": 5 },
+    { "bucket_start": "2026-01-15T02:00:00Z", "total": 60,  "successful": 58,  "failed": 2 },
+    { "bucket_start": "2026-01-15T03:00:00Z", "total": 45,  "successful": 44,  "failed": 1 },
+    { "bucket_start": "2026-01-15T04:00:00Z", "total": 70,  "successful": 65,  "failed": 5 },
+    { "bucket_start": "2026-01-15T05:00:00Z", "total": 140, "successful": 130, "failed": 10 },
+    { "bucket_start": "2026-01-15T06:00:00Z", "total": 210, "successful": 195, "failed": 15 },
+    { "bucket_start": "2026-01-15T07:00:00Z", "total": 290, "successful": 260, "failed": 30 },
+    { "bucket_start": "2026-01-15T08:00:00Z", "total": 230, "successful": 205, "failed": 25 },
+    { "bucket_start": "2026-01-15T09:00:00Z", "total": 170, "successful": 138, "failed": 32 }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "source_ip": "203.0.113.10",
+      "suspicious_request_count": 11,
+      "categories": ["BRUTE_FORCE"],
+      "latest_activity": "2026-01-15T10:30:00Z",
+      "alert_count": 1,
+      "open_alert_count": 1,
+      "related_alert_ids": [1],
+      "investigation_status": "INVESTIGATING",
+      "investigation_note": "Originating from suspicious cloud provider ASN."
+    },
+    {
+      "source_ip": "198.51.100.25",
+      "suspicious_request_count": 25,
+      "categories": ["RECONNAISSANCE"],
+      "latest_activity": "2026-01-15T11:15:00Z",
+      "alert_count": 1,
+      "open_alert_count": 1,
+      "related_alert_ids": [2],
+      "investigation_status": "NEW",
+      "investigation_note": null
+    }
+  ],
+  "page": 1,
+  "page_size": 25,
+  "total_items": 2,
+  "total_pages": 1
+}
