@@ -1,7 +1,7 @@
 """Unit tests for Rule B: Request Rate (Excessive Requests) Detection."""
 
-from datetime import datetime, timedelta, timezone
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from app.detection.detection_settings import DetectionSettings
 from app.detection.rules.request_rate import RequestRateRule
@@ -77,7 +77,9 @@ def test_request_rate_interleaved_ips(fake_counter: FakeWindowCounter):
     for i in range(30):
         fake_counter.add_event(make_event(ip=ip_low, time_offset_sec=-30 + i, base_time=base_time))
     for i in range(60):
-        fake_counter.add_event(make_event(ip=ip_high, time_offset_sec=-30 + (i % 30), base_time=base_time))
+        fake_counter.add_event(
+            make_event(ip=ip_high, time_offset_sec=-30 + (i % 30), base_time=base_time)
+        )
 
     event_low = make_event(ip=ip_low, time_offset_sec=0, base_time=base_time)
     event_high = make_event(ip=ip_high, time_offset_sec=0, base_time=base_time)
@@ -97,7 +99,9 @@ def test_request_rate_severity_levels(fake_counter: FakeWindowCounter):
 
     # Seed 170 events -> ratio 1.7 -> MEDIUM
     for i in range(170):
-        fake_counter.add_event(make_event(ip=ip, time_offset_sec=-40 + (i % 40), base_time=base_time))
+        fake_counter.add_event(
+            make_event(ip=ip, time_offset_sec=-40 + (i % 40), base_time=base_time)
+        )
 
     curr_event = make_event(ip=ip, time_offset_sec=0, base_time=base_time)
     result = rule.evaluate(curr_event, fake_counter)
@@ -106,7 +110,9 @@ def test_request_rate_severity_levels(fake_counter: FakeWindowCounter):
 
     # Add 150 more -> 320 events total -> ratio 3.2 -> HIGH
     for i in range(150):
-        fake_counter.add_event(make_event(ip=ip, time_offset_sec=-40 + (i % 40), base_time=base_time))
+        fake_counter.add_event(
+            make_event(ip=ip, time_offset_sec=-40 + (i % 40), base_time=base_time)
+        )
 
     result_high = rule.evaluate(curr_event, fake_counter)
     assert result_high is not None

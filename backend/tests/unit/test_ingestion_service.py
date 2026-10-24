@@ -1,9 +1,8 @@
 """Unit tests for IngestionService using fake repositories and mock sessions."""
 
+import uuid
 from datetime import datetime, timezone
 from typing import Any, List, Optional
-import uuid
-import pytest
 
 from app.core.config import Settings
 from app.detection.detection_settings import DetectionSettings
@@ -50,7 +49,9 @@ class DummyWindowCounter(WindowCounter):
     def count_requests(self, *, source_ip: str, start: datetime, end: datetime) -> int:
         return 1
 
-    def count_by_status(self, *, statuses, start, end, source_ip=None, user_id=None, exclude_path=None) -> int:
+    def count_by_status(
+        self, *, statuses, start, end, source_ip=None, user_id=None, exclude_path=None
+    ) -> int:
         return 0
 
     def count_login_failures(self, *, source_ip, login_path, start, end) -> int:

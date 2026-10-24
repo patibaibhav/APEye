@@ -1,8 +1,8 @@
 """Unit tests for Rule D: Unauthorized Access (Repeated 401/403) Detection."""
 
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-import uuid
 
 from app.detection.detection_settings import DetectionSettings
 from app.detection.rules.unauthorized_access import UnauthorizedAccessRule
@@ -54,7 +54,9 @@ def test_unauthorized_threshold_boundaries(fake_counter: FakeWindowCounter):
     # 15 events (combination of 401 and 403)
     for i in range(15):
         st = 401 if i % 2 == 0 else 403
-        fake_counter.add_event(make_event(status_code=st, time_offset_sec=-100 + i, base_time=base_time))
+        fake_counter.add_event(
+            make_event(status_code=st, time_offset_sec=-100 + i, base_time=base_time)
+        )
 
     curr_event = make_event(status_code=403, time_offset_sec=0, base_time=base_time)
     # Exactly at threshold 15 -> NO alert

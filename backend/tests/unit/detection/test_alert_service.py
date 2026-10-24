@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
+
 import pytest
 
 from app.core.errors import AlertNotFoundError, InvalidTransitionError, ValidationError
@@ -9,7 +10,6 @@ from app.schemas.alerts import AlertDetail, AlertNoteRead
 from app.schemas.common import AlertStatus, Severity, ThreatCategory
 from app.schemas.detection import DetectionResult
 from app.services.alert_service import (
-    ALLOWED_TRANSITIONS,
     add_note,
     change_status,
     process_results,
@@ -271,7 +271,9 @@ def test_change_status_allowed_and_forbidden_transitions():
     process_results("fake_session", [result], alert_repo=repo)
 
     # 1. ACTIVE -> INVESTIGATING is allowed
-    updated = change_status("fake_session", 1, AlertStatus.INVESTIGATING, actor_id=99, alert_repo=repo)
+    updated = change_status(
+        "fake_session", 1, AlertStatus.INVESTIGATING, actor_id=99, alert_repo=repo
+    )
     assert updated.status == AlertStatus.INVESTIGATING
 
     # 2. INVESTIGATING -> RESOLVED is allowed

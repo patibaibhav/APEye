@@ -89,7 +89,9 @@ def test_api_request_logging_and_header_injection():
 
         async def api_app(scope, receive, send):
             await send({"type": "http.response.start", "status": 200, "headers": []})
-            await send({"type": "http.response.body", "body": b'{"status": "ok"}', "more_body": False})
+            await send(
+                {"type": "http.response.body", "body": b'{"status": "ok"}', "more_body": False}
+            )
 
         middleware = RequestLoggingMiddleware(app=api_app, ingest=captured_events.append)
         scope = create_asgi_scope(path="/api/logs/999?query=secret_value")

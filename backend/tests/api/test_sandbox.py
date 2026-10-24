@@ -3,11 +3,9 @@
 import asyncio
 import json
 from typing import List, Optional
-import pytest
 
-from app.api.routes.sandbox import get_admin_user, get_current_user, verify_sandbox_enabled
+from app.api.routes.sandbox import get_admin_user, get_current_user
 from app.core.config import CoreSettings, Settings
-from app.core.errors import NotFoundError
 from app.main import create_app
 from app.schemas.detection import RequestEvent
 
@@ -104,7 +102,11 @@ def test_sandbox_protected_unauthenticated():
 def test_sandbox_protected_authorized():
     test_app = create_app(ingest_callable=lambda e: None)
     # Simulate valid authenticated user (ANALYST role)
-    test_app.dependency_overrides[get_current_user] = lambda: {"id": 10, "username": "analyst1", "role": "ANALYST"}
+    test_app.dependency_overrides[get_current_user] = lambda: {
+        "id": 10,
+        "username": "analyst1",
+        "role": "ANALYST",
+    }
 
     async def run():
         status_code, data = await asgi_request(
@@ -121,7 +123,11 @@ def test_sandbox_protected_authorized():
 def test_sandbox_admin_only_forbidden_for_analyst():
     test_app = create_app(ingest_callable=lambda e: None)
     # User is authenticated but only has ANALYST role
-    test_app.dependency_overrides[get_current_user] = lambda: {"id": 10, "username": "analyst1", "role": "ANALYST"}
+    test_app.dependency_overrides[get_current_user] = lambda: {
+        "id": 10,
+        "username": "analyst1",
+        "role": "ANALYST",
+    }
 
     async def run():
         status_code, data = await asgi_request(

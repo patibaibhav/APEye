@@ -1,7 +1,7 @@
 """Unit tests for Rule C: Reconnaissance / Scanning Detection."""
 
-from datetime import datetime, timedelta, timezone
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from app.detection.detection_settings import DetectionSettings
 from app.detection.rules.reconnaissance import ReconnaissanceRule
@@ -55,16 +55,30 @@ def test_reconnaissance_all_three_conditions_required(fake_counter: FakeWindowCo
     for i in range(20):
         # Only 5 distinct paths
         counter_fail_distinct.add_event(
-            make_event(ip=ip, path=f"/api/item/{i % 5}", status_code=404, time_offset_sec=-50 + i, base_time=base_time)
+            make_event(
+                ip=ip,
+                path=f"/api/item/{i % 5}",
+                status_code=404,
+                time_offset_sec=-50 + i,
+                base_time=base_time,
+            )
         )
-    curr_event = make_event(ip=ip, path="/api/item/0", status_code=404, time_offset_sec=0, base_time=base_time)
+    curr_event = make_event(
+        ip=ip, path="/api/item/0", status_code=404, time_offset_sec=0, base_time=base_time
+    )
     assert rule.evaluate(curr_event, counter_fail_distinct) is None
 
     # Case 2: distinct >= 15, ratio >= 0.5, but total < 20
     counter_fail_total = FakeWindowCounter()
     for i in range(16):  # Only 16 requests
         counter_fail_total.add_event(
-            make_event(ip=ip, path=f"/api/path_{i}", status_code=404, time_offset_sec=-50 + i, base_time=base_time)
+            make_event(
+                ip=ip,
+                path=f"/api/path_{i}",
+                status_code=404,
+                time_offset_sec=-50 + i,
+                base_time=base_time,
+            )
         )
     assert rule.evaluate(curr_event, counter_fail_total) is None
 
@@ -72,11 +86,23 @@ def test_reconnaissance_all_three_conditions_required(fake_counter: FakeWindowCo
     counter_fail_ratio = FakeWindowCounter()
     for i in range(15):
         counter_fail_ratio.add_event(
-            make_event(ip=ip, path=f"/api/err_{i}", status_code=404, time_offset_sec=-80 + i, base_time=base_time)
+            make_event(
+                ip=ip,
+                path=f"/api/err_{i}",
+                status_code=404,
+                time_offset_sec=-80 + i,
+                base_time=base_time,
+            )
         )
     for i in range(20):
         counter_fail_ratio.add_event(
-            make_event(ip=ip, path=f"/api/ok_{i}", status_code=200, time_offset_sec=-50 + i, base_time=base_time)
+            make_event(
+                ip=ip,
+                path=f"/api/ok_{i}",
+                status_code=200,
+                time_offset_sec=-50 + i,
+                base_time=base_time,
+            )
         )
     # Total = 35, errors = 15 -> ratio = 15/35 = 0.428 < 0.5
     assert rule.evaluate(curr_event, counter_fail_ratio) is None
@@ -85,7 +111,13 @@ def test_reconnaissance_all_three_conditions_required(fake_counter: FakeWindowCo
     counter_success = FakeWindowCounter()
     for i in range(20):
         counter_success.add_event(
-            make_event(ip=ip, path=f"/api/probe_{i}", status_code=404, time_offset_sec=-60 + i, base_time=base_time)
+            make_event(
+                ip=ip,
+                path=f"/api/probe_{i}",
+                status_code=404,
+                time_offset_sec=-60 + i,
+                base_time=base_time,
+            )
         )
     result = rule.evaluate(curr_event, counter_success)
     assert result is not None
@@ -111,14 +143,26 @@ def test_reconnaissance_sensitive_patterns_bump(fake_counter: FakeWindowCounter)
     # Include 3 sensitive patterns: /admin, /.env, /.git
     sensitive_paths = ["/admin/login", "/.env", "/.git/config"]
     for i, sp in enumerate(sensitive_paths):
-        fake_counter.add_event(make_event(ip=ip, path=sp, status_code=404, time_offset_sec=-60 + i, base_time=base_time))
+        fake_counter.add_event(
+            make_event(
+                ip=ip, path=sp, status_code=404, time_offset_sec=-60 + i, base_time=base_time
+            )
+        )
 
     for i in range(17):
         fake_counter.add_event(
-            make_event(ip=ip, path=f"/api/dummy_{i}", status_code=404, time_offset_sec=-40 + i, base_time=base_time)
+            make_event(
+                ip=ip,
+                path=f"/api/dummy_{i}",
+                status_code=404,
+                time_offset_sec=-40 + i,
+                base_time=base_time,
+            )
         )
 
-    curr_event = make_event(ip=ip, path="/.git/config", status_code=404, time_offset_sec=0, base_time=base_time)
+    curr_event = make_event(
+        ip=ip, path="/.git/config", status_code=404, time_offset_sec=0, base_time=base_time
+    )
     result = rule.evaluate(curr_event, fake_counter)
     assert result is not None
     # 3 sensitive patterns hit -> bumps from LOW to MEDIUM!

@@ -7,7 +7,7 @@ from app.schemas.common import Severity
 def test_severity_from_ratio_boundaries():
     # Exactly at ratio 1.0 (threshold) -> LOW
     assert severity_from_ratio(10, 10) == Severity.LOW
-    
+
     # Just below 1.5 -> LOW
     assert severity_from_ratio(14, 10) == Severity.LOW
 

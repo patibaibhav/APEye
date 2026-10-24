@@ -1,7 +1,7 @@
 """Unit tests for DetectionEngine: rule ordering, multiple alerts, and failure isolation."""
 
-from datetime import datetime, timezone
 import uuid
+from datetime import datetime, timezone
 
 from app.detection.engine import DetectionEngine, build_default_engine
 from app.detection.interfaces import WindowCounter
@@ -34,6 +34,7 @@ def make_event(
 
 class ExplodingRule:
     """A faulty rule that always raises an unhandled exception."""
+
     category = ThreatCategory.BRUTE_FORCE
 
     def evaluate(self, event: RequestEvent, counter: WindowCounter) -> DetectionResult | None:
@@ -42,6 +43,7 @@ class ExplodingRule:
 
 class AlwaysAlertRule:
     """A mock rule that always returns a detection result."""
+
     def __init__(self, category: ThreatCategory) -> None:
         self.category = category
 

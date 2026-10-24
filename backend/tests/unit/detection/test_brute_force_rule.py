@@ -1,7 +1,7 @@
 """Unit tests for Rule A: Brute Force Detection."""
 
-from datetime import datetime, timedelta, timezone
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from app.detection.detection_settings import DetectionSettings
 from app.detection.rules.brute_force import BruteForceRule
@@ -126,7 +126,9 @@ def test_brute_force_severity_bump_on_login_success(fake_counter: FakeWindowCoun
         fake_counter.add_event(make_event(ip=ip, time_offset_sec=-100 + i, base_time=base_time))
 
     # Add a login success (200 OK) in the same window
-    fake_counter.add_event(make_event(ip=ip, status_code=200, time_offset_sec=-10, base_time=base_time))
+    fake_counter.add_event(
+        make_event(ip=ip, status_code=200, time_offset_sec=-10, base_time=base_time)
+    )
 
     curr_event = make_event(ip=ip, time_offset_sec=0, base_time=base_time)
     result = rule.evaluate(curr_event, fake_counter)

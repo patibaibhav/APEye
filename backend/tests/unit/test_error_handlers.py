@@ -1,14 +1,13 @@
 """Unit tests for error hierarchy and standardized error envelope formatting."""
 
 import pytest
-from pydantic import BaseModel, ValidationError as PydanticValidationError
+from pydantic import BaseModel
+from pydantic import ValidationError as PydanticValidationError
 
 from app.core.errors import (
     AlertNotFoundError,
-    AppError,
     ForbiddenError,
     InvalidTransitionError,
-    NotFoundError,
     TokenExpiredError,
     UnauthenticatedError,
     build_error_response,
@@ -26,8 +25,9 @@ def test_build_error_response_envelope():
     )
     assert response.status_code == 404
     import json
+
     data = json.loads(response.body.decode("utf-8"))
-    
+
     # Must validate against ErrorEnvelope schema
     envelope = ErrorEnvelope.model_validate(data)
     assert envelope.error.code == "ALERT_NOT_FOUND"
@@ -63,11 +63,13 @@ def test_error_envelope_rejects_extra_fields():
         pass
 
     with pytest.raises(PydanticValidationError):
-        ErrorEnvelope.model_validate({
-            "error": {
-                "code": "TEST",
-                "message": "msg",
-                "request_id": "123",
-                "stack_trace": "should_be_forbidden",
+        ErrorEnvelope.model_validate(
+            {
+                "error": {
+                    "code": "TEST",
+                    "message": "msg",
+                    "request_id": "123",
+                    "stack_trace": "should_be_forbidden",
+                }
             }
-        })
+        )

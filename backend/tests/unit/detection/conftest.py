@@ -3,6 +3,7 @@
 from collections import Counter
 from datetime import datetime
 from typing import List, Optional, Sequence
+
 import pytest
 
 from app.detection.interfaces import WindowCounter
@@ -23,9 +24,7 @@ class FakeWindowCounter(WindowCounter):
         if self.should_raise:
             raise RuntimeError("Simulated counter database failure")
         return sum(
-            1
-            for e in self.events
-            if e.source_ip == source_ip and start < e.occurred_at <= end
+            1 for e in self.events if e.source_ip == source_ip and start < e.occurred_at <= end
         )
 
     def count_by_status(
