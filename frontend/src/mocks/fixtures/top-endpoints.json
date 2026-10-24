@@ -1,0 +1,10 @@
+{
+  "items": [
+    { "endpoint": "/api/auth/login", "request_count": 420, "error_count": 65 },
+    { "endpoint": "/api/logs", "request_count": 310, "error_count": 5 },
+    { "endpoint": "/api/dashboard/summary", "request_count": 280, "error_count": 0 },
+    { "endpoint": "/api/alerts", "request_count": 190, "error_count": 2 },
+    { "endpoint": "/api/reports/summary", "request_count": 120, "error_count": 12 },
+    { "endpoint": "/api/suspicious-ips", "request_count": 100, "error_count": 0 }
+  ]
+}

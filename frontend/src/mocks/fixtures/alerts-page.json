@@ -1,0 +1,47 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "category": "BRUTE_FORCE",
+      "severity": "HIGH",
+      "status": "ACTIVE",
+      "source_ip": "203.0.113.10",
+      "endpoints": ["/api/auth/login"],
+      "request_count": 11,
+      "window_seconds": 300,
+      "event_count": 1,
+      "first_detected_at": "2026-01-15T10:30:00Z",
+      "last_detected_at": "2026-01-15T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "category": "RECONNAISSANCE",
+      "severity": "MEDIUM",
+      "status": "INVESTIGATING",
+      "source_ip": "198.51.100.25",
+      "endpoints": ["/admin", "/.env", "/config"],
+      "request_count": 25,
+      "window_seconds": 120,
+      "event_count": 3,
+      "first_detected_at": "2026-01-15T11:00:00Z",
+      "last_detected_at": "2026-01-15T11:15:00Z"
+    },
+    {
+      "id": 3,
+      "category": "EXCESSIVE_REQUESTS",
+      "severity": "LOW",
+      "status": "RESOLVED",
+      "source_ip": "192.0.2.42",
+      "endpoints": ["/api/dashboard/summary"],
+      "request_count": 150,
+      "window_seconds": 60,
+      "event_count": 5,
+      "first_detected_at": "2026-01-15T09:00:00Z",
+      "last_detected_at": "2026-01-15T09:10:00Z"
+    }
+  ],
+  "page": 1,
+  "page_size": 25,
+  "total_items": 3,
+  "total_pages": 1
+}

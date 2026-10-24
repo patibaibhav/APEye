@@ -1,0 +1,26 @@
+{
+  "source_ip": "203.0.113.10",
+  "suspicious_request_count": 11,
+  "categories": ["BRUTE_FORCE"],
+  "latest_activity": "2026-01-15T10:30:00Z",
+  "alert_count": 1,
+  "open_alert_count": 1,
+  "related_alert_ids": [1],
+  "investigation_status": "INVESTIGATING",
+  "investigation_note": "Originating from suspicious cloud provider ASN.",
+  "alerts": [
+    {
+      "id": 1,
+      "category": "BRUTE_FORCE",
+      "severity": "HIGH",
+      "status": "ACTIVE",
+      "source_ip": "203.0.113.10",
+      "endpoints": ["/api/auth/login"],
+      "request_count": 11,
+      "window_seconds": 300,
+      "event_count": 1,
+      "first_detected_at": "2026-01-15T10:30:00Z",
+      "last_detected_at": "2026-01-15T10:30:00Z"
+    }
+  ]
+}
