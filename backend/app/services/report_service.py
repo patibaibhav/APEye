@@ -13,6 +13,7 @@ from app.db.repositories import (
     log_repository,
     report_repository,
 )
+from app.integrations.cloudwatch import emit_metric
 from app.integrations.storage import generate_report_object_key, get_storage
 from app.services.export_service import generate_csv_string, get_export_max_rows
 
@@ -169,12 +170,16 @@ def create_archive_artifact(
     }
 
     # Upload to storage backend (Local or S3)
-    info = storage.upload_bytes(
-        key=object_key,
-        data=payload,
-        content_type=content_type,
-        metadata=metadata,
-    )
+    try:
+        info = storage.upload_bytes(
+            key=object_key,
+            data=payload,
+            content_type=content_type,
+            metadata=metadata,
+        )
+    except Exception:
+        emit_metric("ReportUploadsFailed")
+        raise
 
     # Persist report archive record in database
     archive_record = report_repository.create_report_archive(

@@ -26,13 +26,24 @@ def is_cloudwatch_enabled() -> bool:
 
 
 def configure_cloudwatch_logging(log_level: str = "INFO") -> None:
-    """Attaches Watchtower logging handler to the operational logger if enabled."""
+    """Attaches Watchtower logging handler to the operational logger if enabled.
+
+    Credentials come from boto3's default chain (instance profile on EC2/Beanstalk,
+    environment variables or ~/.aws/credentials on a laptop). Nothing is hardcoded.
+    """
     if not is_cloudwatch_enabled():
         return
 
     try:
         import boto3
         import watchtower
+
+        ops_logger = logging.getLogger("app.ops")
+        # Avoid attaching a second CloudWatch handler if create_app() runs more than once
+        if any(isinstance(h, watchtower.CloudWatchLogHandler) for h in ops_logger.handlers):
+            return
+
+        from app.core.logging_config import JsonFormatter
 
         log_group = os.getenv("CW_LOG_GROUP", "/api-security-monitor/app")
         stream_prefix = os.getenv("CW_LOG_STREAM_PREFIX", "local-dev")
@@ -49,8 +60,9 @@ def configure_cloudwatch_logging(log_level: str = "INFO") -> None:
             send_interval=10,
         )
         cw_handler.setLevel(getattr(logging, log_level.upper(), logging.INFO))
+        # Ship the same one-line JSON the console handler prints
+        cw_handler.setFormatter(JsonFormatter())
 
-        ops_logger = logging.getLogger("app.ops")
         ops_logger.addHandler(cw_handler)
     except Exception as exc:
         print(f"[WARN] Failed to configure CloudWatch logging: {exc}", file=sys.stderr)
@@ -116,3 +128,33 @@ def flush_metrics() -> None:
     except Exception as exc:
         # CloudWatch outage must never fail the application: log to stderr and gracefully continue
         print(f"[WARN] CloudWatch flush_metrics failed: {exc}", file=sys.stderr)
+
+
+_FLUSH_THREAD: Optional[threading.Thread] = None
+_FLUSH_STOP = threading.Event()
+
+
+def start_metrics_flusher() -> None:
+    """Starts a daemon thread that flushes buffered metrics every CW_METRICS_FLUSH_SECONDS."""
+    global _FLUSH_THREAD
+    if not is_cloudwatch_enabled():
+        return
+    if _FLUSH_THREAD is not None and _FLUSH_THREAD.is_alive():
+        return
+
+    interval = max(10, int(os.getenv("CW_METRICS_FLUSH_SECONDS", "60")))
+    _FLUSH_STOP.clear()
+
+    def _loop() -> None:
+        while not _FLUSH_STOP.wait(interval):
+            flush_metrics()
+
+    _FLUSH_THREAD = threading.Thread(target=_loop, name="cw-metrics-flusher", daemon=True)
+    _FLUSH_THREAD.start()
+
+
+def stop_metrics_flusher() -> None:
+    """Stops the flusher thread and pushes any remaining buffered metrics."""
+    _FLUSH_STOP.set()
+    flush_metrics()
+

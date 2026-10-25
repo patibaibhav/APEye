@@ -3,6 +3,7 @@
 Wires settings, logging, middleware order, central router, and error handlers.
 """
 
+from contextlib import asynccontextmanager
 from typing import Callable, Optional
 
 from fastapi import FastAPI
@@ -11,6 +12,11 @@ from app.api.router import api_router
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging_config import configure_logging, get_ops_logger
+from app.integrations.cloudwatch import (
+    configure_cloudwatch_logging,
+    start_metrics_flusher,
+    stop_metrics_flusher,
+)
 from app.middleware.request_logging import RequestLoggingMiddleware
 from app.schemas.detection import RequestEvent
 
@@ -22,13 +28,28 @@ def create_app(
     """Application factory creating a configured FastAPI instance."""
     cfg = settings or get_settings()
 
+    if cfg.app_env == "aws":
+        from app.auth.config import get_auth_settings
+
+        if get_auth_settings().jwt_secret_key.startswith("replace-with-a-random"):
+            raise RuntimeError("JWT_SECRET_KEY must be set to a random value on AWS")
+
     # 1. Configure operational JSON logger
     configure_logging(cfg.log_level)
+    configure_cloudwatch_logging(cfg.log_level)  # no-op unless CLOUDWATCH_ENABLED=true
     ops_logger = get_ops_logger()
     ops_logger.info("application_startup", extra={"extra_fields": {"env": cfg.app_env}})
 
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        start_metrics_flusher()  # no-op unless CLOUDWATCH_ENABLED=true
+        yield
+        ops_logger.info("application_shutdown")
+        stop_metrics_flusher()
+
     # 2. Instantiate FastAPI app
     application = FastAPI(
+        lifespan=lifespan,
         title="APEye - API Security Monitoring Platform",
         version="0.1.0",
         docs_url="/docs",

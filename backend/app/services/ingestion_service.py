@@ -9,6 +9,7 @@ from typing import Any, Callable, Optional
 from app.core.config import Settings, get_settings
 from app.core.logging_config import get_ops_logger
 from app.detection.engine import DetectionEngine
+from app.integrations.cloudwatch import emit_metric
 from app.schemas.detection import RequestEvent
 from app.services import alert_service
 
@@ -79,6 +80,7 @@ class IngestionService:
                     }
                 },
             )
+            emit_metric("RequestLogWriteFailures")
             # Failure in log writing terminates ingestion without running detection
             try:
                 session.close()
@@ -123,6 +125,7 @@ class IngestionService:
                     }
                 },
             )
+            emit_metric("DetectionErrors")
         finally:
             try:
                 session.close()

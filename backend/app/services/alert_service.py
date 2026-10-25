@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 from app.core.errors import AlertNotFoundError, InvalidTransitionError, ValidationError
 from app.core.logging_config import get_ops_logger
+from app.integrations.cloudwatch import emit_metric
 from app.schemas.alerts import AlertNoteRead, AlertRead
 from app.schemas.common import AlertStatus, Severity
 from app.schemas.detection import AlertOutcome, DetectionResult
@@ -153,6 +154,7 @@ def process_results(
                 outcomes.append(
                     AlertOutcome(action="auto_closed_and_created", alert_id=new_alert.id)
                 )
+                emit_metric("AlertsCreated")
 
         else:
             # No open alert exists; create a new alert
@@ -170,6 +172,7 @@ def process_results(
                     },
                 )
                 outcomes.append(AlertOutcome(action="created", alert_id=new_alert.id))
+                emit_metric("AlertsCreated")
             except Exception as exc:
                 # Handle race condition: partial unique index conflict
                 if "IntegrityError" in type(exc).__name__ or "unique" in str(exc).lower():
