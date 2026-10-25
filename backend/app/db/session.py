@@ -6,6 +6,7 @@ Provides:
 - get_db(): FastAPI dependency for yielding request-scoped database sessions
 """
 
+from contextlib import contextmanager
 from typing import Generator
 
 from sqlalchemy import create_engine
@@ -38,3 +39,18 @@ def get_db() -> Generator[Session, None, None]:
         yield session
     finally:
         session.close()
+
+
+@contextmanager
+def session_scope() -> Generator[Session, None, None]:
+    """Context manager for background services and scripts with auto-commit/rollback."""
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+

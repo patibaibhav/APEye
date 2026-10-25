@@ -4,9 +4,9 @@ Wires settings, logging, middleware order, central router, and error handlers.
 """
 
 from typing import Callable, Optional
+
 from fastapi import FastAPI
 
-import app
 from app.api.router import api_router
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
@@ -30,7 +30,7 @@ def create_app(
     # 2. Instantiate FastAPI app
     application = FastAPI(
         title="APEye - API Security Monitoring Platform",
-        version=getattr(app, "__version__", "0.1.0"),
+        version="0.1.0",
         docs_url="/docs",
         redoc_url="/redoc",
     )
@@ -44,6 +44,10 @@ def create_app(
 
     # 4. Mount API router under /api
     application.include_router(api_router, prefix="/api")
+
+    # 4b. Configure SPA static files and fallback routing
+    from app.static_site import configure_static_site
+    configure_static_site(application, cfg.static_dir)
 
     # 5. Determine event ingestion callable for middleware
     if ingest_callable is not None:

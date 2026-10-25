@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional, Tuple
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.common import AuthOutcome, Severity, ThreatCategory

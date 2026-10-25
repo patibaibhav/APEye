@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import Any, Generic, List, Optional, TypeVar
+
 from pydantic import BaseModel, ConfigDict, Field
 
 

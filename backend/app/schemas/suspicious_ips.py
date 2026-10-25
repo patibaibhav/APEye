@@ -9,6 +9,7 @@ Follows the API contract:
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.alerts import AlertListItem

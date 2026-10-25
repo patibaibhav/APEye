@@ -10,6 +10,7 @@ Follows the API Contract:
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+
 from fastapi import Query
 
 from app.core.errors import ValidationError
@@ -62,7 +63,7 @@ class TimeRangeParams:
 
         if (parsed_to - parsed_from).total_seconds() > 31 * 86400:
             raise ValidationError(
-                f"Time range span exceeds maximum allowable span of 31 days"
+                "Time range span exceeds maximum allowable span of 31 days"
             )
 
         self.from_time = parsed_from

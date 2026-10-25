@@ -6,8 +6,9 @@ All non-2xx responses conform to:
 Never exposes internal stack traces or secrets to clients.
 """
 
-from typing import Any, Optional
 import uuid
+from typing import Any, Optional
+
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -109,7 +110,7 @@ class ValidationError(AppError):
         super().__init__(
             message=message,
             code=ErrorCode.VALIDATION_ERROR,
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             details=details,
         )
 
@@ -223,11 +224,11 @@ def register_error_handlers(app: FastAPI) -> None:
         # Format field problems cleanly without leaking internal structures
         formatted_details = []
         for error in exc.errors():
-            loc = " -> ".join(str(l) for l in error.get("loc", []))
+            loc = " -> ".join(str(part) for part in error.get("loc", []))
             formatted_details.append({"loc": loc, "msg": error.get("msg"), "type": error.get("type")})
 
         return build_error_response(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             code=ErrorCode.VALIDATION_ERROR.value,
             message="Request validation failed",
             request_id=req_id,
@@ -249,7 +250,7 @@ def register_error_handlers(app: FastAPI) -> None:
             code = ErrorCode.INVALID_TRANSITION.value
         elif exc.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE:
             code = ErrorCode.EXPORT_TOO_LARGE.value
-        elif exc.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY:
+        elif exc.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT:
             code = ErrorCode.VALIDATION_ERROR.value
         elif exc.status_code == status.HTTP_503_SERVICE_UNAVAILABLE:
             code = ErrorCode.STORAGE_UNAVAILABLE.value

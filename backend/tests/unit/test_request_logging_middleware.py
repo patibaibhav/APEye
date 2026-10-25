@@ -93,7 +93,9 @@ def test_api_request_logging_and_header_injection():
                 {"type": "http.response.body", "body": b'{"status": "ok"}', "more_body": False}
             )
 
-        middleware = RequestLoggingMiddleware(app=api_app, ingest=captured_events.append)
+        middleware = RequestLoggingMiddleware(
+            app=api_app, ingest=captured_events.append, ignored_prefixes=frozenset()
+        )
         scope = create_asgi_scope(path="/api/logs/999?query=secret_value")
 
         async def mock_send(message):
@@ -140,7 +142,9 @@ def test_auth_state_handoff_and_streaming():
             await asyncio.sleep(0.01)
             await send({"type": "http.response.body", "body": b"chunk2", "more_body": False})
 
-        middleware = RequestLoggingMiddleware(app=streaming_app, ingest=captured_events.append)
+        middleware = RequestLoggingMiddleware(
+            app=streaming_app, ingest=captured_events.append, ignored_prefixes=frozenset()
+        )
         scope = create_asgi_scope(path="/api/exports/logs.csv")
         await middleware(scope, dummy_receive, dummy_send)
 
@@ -195,5 +199,41 @@ def test_ingest_failure_never_affects_client_response():
         # Ingestion failure must be caught and logged, NEVER failing the client!
         await middleware(scope, dummy_receive, dummy_send)
         assert response_received is True
+
+    asyncio.run(run_test())
+
+
+def test_management_prefixes_excluded_by_default():
+    """APEye's own management endpoints must NOT be recorded as monitored traffic."""
+    async def run_test():
+        captured_events: List[RequestEvent] = []
+
+        async def ok_app(scope, receive, send):
+            await send({"type": "http.response.start", "status": 200, "headers": []})
+            await send({"type": "http.response.body", "body": b"ok", "more_body": False})
+
+        middleware = RequestLoggingMiddleware(app=ok_app, ingest=captured_events.append)
+
+        mgmt_paths = [
+            "/api/dashboard/summary",
+            "/api/logs",
+            "/api/logs/123",
+            "/api/alerts",
+            "/api/alerts/5",
+            "/api/reports/daily",
+            "/api/exports/logs.csv",
+            "/api/suspicious-ips",
+            "/api/users",
+        ]
+        for path in mgmt_paths:
+            scope = create_asgi_scope(path=path)
+            await middleware(scope, dummy_receive, dummy_send)
+        assert len(captured_events) == 0, f"Management paths should be ignored, got {captured_events}"
+
+        # But sandbox endpoints (the monitored application) MUST be recorded
+        sandbox_scope = create_asgi_scope(path="/api/sandbox/users")
+        await middleware(sandbox_scope, dummy_receive, dummy_send)
+        assert len(captured_events) == 1
+        assert captured_events[0].path == "/api/sandbox/users"
 
     asyncio.run(run_test())

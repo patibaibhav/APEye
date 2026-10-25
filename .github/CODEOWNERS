@@ -1,0 +1,50 @@
+# CODEOWNERS (Authored per AGENTS.md ownership agreement)
+
+# Default ownership: Baibhav owns core entry architecture, deploy, scripts, root files, and docs
+* @baibhav
+
+# Lava: all frontend code, routing, UI, charts, pages, client/auth, mocks, tests, build
+/frontend/ @lava
+/.github/workflows/frontend-ci.yml @lava
+
+# Anvi: database schema, models, repositories, sessions, migrations, auth,
+# reporting/CSV, S3/CloudWatch integrations, demo seed scripts, docker-compose
+/backend/alembic/ @anvi
+/backend/app/db/ @anvi
+/backend/app/auth/ @anvi
+/backend/app/integrations/ @anvi
+/backend/app/services/export_service.py @anvi
+/backend/app/services/report_service.py @anvi
+/backend/app/api/auth.py @anvi
+/backend/app/api/users.py @anvi
+/backend/app/api/logs.py @anvi
+/backend/app/api/dashboard.py @anvi
+/backend/app/api/exports.py @anvi
+/backend/app/api/reports.py @anvi
+/backend/app/schemas/auth.py @anvi
+/backend/app/schemas/users.py @anvi
+/backend/app/schemas/logs.py @anvi
+/backend/app/schemas/dashboard.py @anvi
+/backend/app/schemas/reports.py @anvi
+/backend/tests/db/ @anvi
+/backend/tests/integrations/ @anvi
+/docker-compose.yml @anvi
+/create_admin.py @anvi
+/seed_demo_data.py @anvi
+
+# Baibhav: detection, alerts, suspicious-IP, health/sandbox, middleware, core, deploy, scripts
+/backend/app/detection/ @baibhav
+/backend/app/middleware/ @baibhav
+/backend/app/core/ @baibhav
+/backend/app/services/alert_service.py @baibhav
+/backend/app/services/ingestion_service.py @baibhav
+/backend/app/api/alerts.py @baibhav
+/backend/app/api/suspicious_ips.py @baibhav
+/backend/app/api/health.py @baibhav
+/backend/app/api/sandbox.py @baibhav
+/backend/app/schemas/alerts.py @baibhav
+/backend/app/schemas/suspicious_ips.py @baibhav
+/backend/app/schemas/detection.py @baibhav
+/deploy/ @baibhav
+/scripts/ @baibhav
+/.github/workflows/backend-ci.yml @baibhav

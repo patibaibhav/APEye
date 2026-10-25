@@ -91,18 +91,18 @@ def create_archive_artifact(
         ]
         rows = [
             [
-                l.id,
-                l.request_id,
-                l.occurred_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                l.source_ip,
-                l.path,
-                l.method,
-                l.status_code,
-                l.response_time_ms,
-                l.auth_outcome,
-                l.user_id or "",
+                item.id,
+                item.request_id,
+                item.occurred_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                item.source_ip,
+                item.path,
+                item.method,
+                item.status_code,
+                item.response_time_ms,
+                item.auth_outcome,
+                item.user_id or "",
             ]
-            for l in logs
+            for item in logs
         ]
         csv_text = generate_csv_string(headers, rows)
         payload = gzip.compress(csv_text.encode("utf-8"))

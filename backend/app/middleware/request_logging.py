@@ -6,10 +6,11 @@ Runs event ingestion asynchronously in a threadpool with error isolation.
 """
 
 import asyncio
+import uuid
 from datetime import datetime, timezone
 from time import perf_counter
 from typing import Callable, FrozenSet, Optional
-import uuid
+
 from starlette.concurrency import run_in_threadpool
 
 from app.core.logging_config import get_ops_logger
@@ -22,12 +23,25 @@ from app.schemas.detection import RequestEvent
 class RequestLoggingMiddleware:
     """Pure ASGI middleware for capturing request metadata and triggering background ingestion."""
 
+    # APEye's own management/telemetry route prefixes — these are NOT part of the
+    # monitored target application and must never be recorded as tracked traffic.
+    _DEFAULT_IGNORED_PREFIXES: FrozenSet[str] = frozenset({
+        "/api/dashboard",
+        "/api/logs",
+        "/api/alerts",
+        "/api/reports",
+        "/api/exports",
+        "/api/suspicious-ips",
+        "/api/users",
+    })
+
     def __init__(
         self,
         app: Callable,
         ingest: Callable[[RequestEvent], None],
         trusted_proxy_count: int = 0,
         ignored_paths: Optional[FrozenSet[str]] = None,
+        ignored_prefixes: Optional[FrozenSet[str]] = None,
     ) -> None:
         self.app = app
         self.ingest = ingest
@@ -35,6 +49,16 @@ class RequestLoggingMiddleware:
         self.ignored_paths: FrozenSet[str] = (
             ignored_paths if ignored_paths is not None else frozenset({"/api/health"})
         )
+        self.ignored_prefixes: FrozenSet[str] = (
+            ignored_prefixes if ignored_prefixes is not None
+            else self._DEFAULT_IGNORED_PREFIXES
+        )
+
+    def _is_ignored(self, path: str) -> bool:
+        """Return True if the path matches an exact ignored path or an ignored prefix."""
+        if path in self.ignored_paths:
+            return True
+        return any(path.startswith(prefix) for prefix in self.ignored_prefixes)
 
     async def __call__(self, scope: dict, receive: Callable, send: Callable) -> None:
         if scope.get("type") != "http":
@@ -45,8 +69,8 @@ class RequestLoggingMiddleware:
         # Remove any query string if present in path
         path_only = raw_path.split("?")[0]
 
-        # Only paths starting with /api are recorded, except ignored_paths (/api/health)
-        is_recorded = path_only.startswith("/api") and (path_only not in self.ignored_paths)
+        # Only /api paths are candidates; exclude health, dashboard, and other mgmt routes
+        is_recorded = path_only.startswith("/api") and not self._is_ignored(path_only)
 
         # Generate unique request_id
         request_id = str(uuid.uuid4())

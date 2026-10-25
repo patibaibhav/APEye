@@ -7,12 +7,13 @@ Follows the API Contract:
 - POST /api/alerts/{id}/notes: Add note to alert
 """
 
-from typing import Any, Callable, Optional
+from typing import Any, Optional
+
 from fastapi import APIRouter, Depends, Query, status
 
 from app.api.common_params import PaginationParams, TimeRangeParams
 from app.api.routes.sandbox import get_current_user
-from app.core.errors import AlertNotFoundError, NotFoundError
+from app.core.errors import AlertNotFoundError
 from app.schemas.alerts import (
     AlertDetail,
     AlertListItem,

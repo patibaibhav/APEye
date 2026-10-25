@@ -3,8 +3,9 @@
 Composes CoreSettings and DetectionSettings according to the blueprint.
 """
 
-from functools import lru_cache
 import os
+from functools import lru_cache
+
 from pydantic import BaseModel, Field
 
 from app.detection.detection_settings import DetectionSettings

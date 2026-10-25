@@ -4,11 +4,11 @@ Follows the Logging Contract: JSON output, UTC ISO-8601 timestamps with 'Z',
 no secrets, passwords, tokens, or request bodies.
 """
 
-from datetime import datetime, timezone
 import json
 import logging
 import sys
-from typing import Any, Dict, Optional
+from datetime import datetime, timezone
+from typing import Any, Dict
 
 _LOGGER_NAME = "app.ops"
 

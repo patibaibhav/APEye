@@ -6,6 +6,7 @@ Follows the Detection and API contracts.
 
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Sequence, Set
+
 from pydantic import BaseModel
 
 from app.core.errors import AlertNotFoundError, InvalidTransitionError, ValidationError

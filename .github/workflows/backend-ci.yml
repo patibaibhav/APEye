@@ -1,0 +1,70 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'scripts/**'
+      - 'deploy/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'scripts/**'
+      - 'deploy/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: apimonitor
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements-dev.txt
+
+      - name: Run linter (ruff)
+        run: ruff check backend/
+
+      - name: Run Alembic migrations
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/apimonitor
+        run: alembic upgrade head
+
+      - name: Run pytest test suite
+        working-directory: ./backend
+        env:
+          PYTHONPATH: .
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/apimonitor
+          JWT_SECRET_KEY: test_secret_key_minimum_32_characters_long_for_ci
+          CLOUDWATCH_ENABLED: "false"
+          STORAGE_BACKEND: local
+        run: pytest -v --tb=short

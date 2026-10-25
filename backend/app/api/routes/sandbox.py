@@ -8,7 +8,8 @@ Follows the API Contract and Blueprint:
 - Integrates with Anvi's auth dependencies when available.
 """
 
-from typing import Any, Callable, Tuple
+from typing import Any
+
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 

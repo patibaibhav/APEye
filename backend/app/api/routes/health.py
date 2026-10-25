@@ -8,8 +8,7 @@ Follows the API contract:
 """
 
 from datetime import datetime, timezone
-import os
-from typing import Callable
+
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel
 
